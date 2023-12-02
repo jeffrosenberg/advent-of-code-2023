@@ -1,14 +1,10 @@
-package main
+package day1
 
 import (
 	"strconv"
-
-	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/readaoc"
 )
 
-func main() {
-	value := 0
-	lines := readaoc.ReadAocInput("inputs/1.txt")
+func Answer(lines []string) (value int) {
 	for i := 0; i < len(lines); i++ {
 		val, err := extractCalibrationValue(lines[i])
 		if err != nil {
@@ -16,7 +12,7 @@ func main() {
 		}
 		value += val
 	}
-	println(value)
+	return
 }
 
 func extractCalibrationValue(input string) (int, error) {
