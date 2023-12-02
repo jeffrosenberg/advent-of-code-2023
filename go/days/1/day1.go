@@ -22,30 +22,22 @@ func main() {
 func extractCalibrationValue(input string) (int, error) {
 	value := 0
 	chars := []rune(input)
+	var digits []int
 
-	// first number - iterate forwards
+	// iterate through and store digits
 	for i := 0; i < len(chars); i++ {
 		if isDigit(chars[i]) {
 			digit, err := strconv.Atoi(string(chars[i]))
 			if err != nil {
 				return 0, err
 			}
-			value += digit * 10
-			break
+			digits = append(digits, digit)
 		}
 	}
 
-	// second number - iterate backwards
-	for i := len(chars) - 1; i >= 0; i-- {
-		if isDigit(chars[i]) {
-			digit, err := strconv.Atoi(string(chars[i]))
-			if err != nil {
-				return 0, err
-			}
-			value += digit
-			break
-		}
-	}
+	// assemble calibration value
+	value += digits[0] * 10
+	value += digits[len(digits)-1]
 
 	return value, nil
 }
