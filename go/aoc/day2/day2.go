@@ -3,6 +3,7 @@ package day2
 import (
 	"bufio"
 	"errors"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -15,6 +16,45 @@ var limits = map[string]int{
 }
 
 func Answer(lines []string) (value int) {
+	return AnswerPart2(lines)
+}
+
+func AnswerPart2(lines []string) (value int) {
+	for i := 0; i < len(lines); i++ {
+		scanner := bufio.NewScanner(strings.NewReader(lines[i]))
+		scanner.Split(bufio.ScanWords)
+
+		// We don't care about Game ID anymore,
+		// but we still need to parse that part of the input
+		_, err := getGameId(scanner)
+		if err != nil {
+			panic(err)
+		}
+
+		// Cache the max observed value for each
+		var max = map[string]int{
+			"red":   0,
+			"green": 0,
+			"blue":  0,
+		}
+
+		for {
+			color, num, err := getCubeDraw(scanner)
+			if err != nil {
+				panic(err)
+			}
+			if color == "" && num == 0 {
+				break
+			}
+			max[color] = int(math.Max(float64(max[color]), float64(num)))
+		}
+
+		value += (max["red"] * max["green"] * max["blue"])
+	}
+	return
+}
+
+func AnswerPart1(lines []string) (value int) {
 	for i := 0; i < len(lines); i++ {
 		scanner := bufio.NewScanner(strings.NewReader(lines[i]))
 		scanner.Split(bufio.ScanWords)
