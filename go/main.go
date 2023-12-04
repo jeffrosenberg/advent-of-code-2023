@@ -1,7 +1,7 @@
 package main
 
 import (
-	aoc "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day3"
+	day3 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day3"
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/readaoc"
 )
 
@@ -10,7 +10,7 @@ import (
 // (input []lines, output int), then go for it
 
 func main() {
-	lines := readaoc.ReadAocInput("inputs/3.txt")
-	value := aoc.Answer(lines)
+	var puzzle day3.Day3Aoc = day3.NewPart2(readaoc.ReadAocInput("inputs/3.txt"))
+	value := day3.Answer(puzzle)
 	println(value)
 }

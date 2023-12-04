@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHasAdjacentSymbols(t *testing.T) {
+func TestPart1Calculation(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    NumberToken
@@ -132,7 +132,102 @@ func TestHasAdjacentSymbols(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			got := hasAdjacentSymbols(test.input, test.line, test.lines)
+			sut := NewPart1(test.lines)
+			got := calculateSymbols(sut, test.input, test.line)
+			assert.Equal(t, test.expected, got)
+		})
+	}
+}
+
+func TestPart2Calculation(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    NumberToken
+		line     int
+		lines    []string
+		expected map[string][]int
+		skip     bool
+	}{
+		{
+			name:  "No adjacent symbols",
+			input: NumberToken{143, 1, 3},
+			line:  1,
+			lines: []string{
+				".....",
+				".143.",
+				".....",
+				".....",
+			},
+			expected: map[string][]int{},
+		},
+		{
+			name:  "Star above",
+			input: NumberToken{143, 1, 3},
+			line:  1,
+			lines: []string{
+				".*...",
+				".143.",
+				".....",
+				".....",
+			},
+			expected: map[string][]int{
+				"0.1": []int{143},
+			},
+		},
+		{
+			name:  "Other symbol above",
+			input: NumberToken{143, 0, 2},
+			line:  1,
+			lines: []string{
+				".&...",
+				"143..",
+				".....",
+				".....",
+			},
+			expected: map[string][]int{},
+		},
+		{
+			name:  "Star above (EOF)",
+			input: NumberToken{143, 1, 3},
+			line:  3,
+			lines: []string{
+				".....",
+				".....",
+				"..*..",
+				".143.",
+			},
+			expected: map[string][]int{
+				"2.2": []int{143},
+			},
+		},
+		{
+			name:  "Star above and below",
+			input: NumberToken{143, 1, 3},
+			line:  3,
+			lines: []string{
+				".....",
+				".....",
+				"..*..",
+				".143.",
+				"....*",
+			},
+			expected: map[string][]int{
+				"2.2": []int{143},
+				"4.4": []int{143},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			sut := NewPart2(test.lines)
+			calculateSymbols(sut, test.input, test.line)
+			got := sut.PossibleGears()
 			assert.Equal(t, test.expected, got)
 		})
 	}
