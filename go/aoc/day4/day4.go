@@ -5,13 +5,6 @@ import (
 	"strings"
 )
 
-type Solver interface {
-	AddValue(int)
-	Lines() []string
-	Solve()
-	Value() int
-}
-
 type Line struct {
 	cardName string
 	winners  map[int]bool
@@ -35,10 +28,6 @@ func NewPart1(lines []string) *Part1 {
 		value: 0,
 	}
 	return &p
-}
-
-func (p *Part1) Lines() []string {
-	return p.lines
 }
 
 func (p *Part1) Value() int {
@@ -66,10 +55,6 @@ func NewPart2(lines []string) *Part2 {
 		value: 0,
 	}
 	return &p
-}
-
-func (p *Part2) Lines() []string {
-	return p.lines
 }
 
 func (p *Part2) Value() int {

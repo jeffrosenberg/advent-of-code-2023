@@ -4,18 +4,53 @@ import (
 	"strconv"
 )
 
-func Answer(lines []string) (value int) {
-	for i := 0; i < len(lines); i++ {
-		val, err := extractCalibrationValue(lines[i])
-		if err != nil {
-			panic(err)
-		}
-		value += val
-	}
-	return
+type Part1 struct {
+	lines []string
+	value int
 }
 
-func extractCalibrationValue(input string) (int, error) {
+func NewPart1(lines []string) *Part1 {
+	p := Part1{
+		lines: lines,
+		value: 0,
+	}
+	return &p
+}
+
+func (p *Part1) Value() int {
+	return p.value
+}
+
+func (p *Part1) Solve() {
+	for _, line := range p.lines {
+		p.value += extractCalibrationValue(line, false)
+	}
+}
+
+type Part2 struct {
+	lines []string
+	value int
+}
+
+func NewPart2(lines []string) *Part2 {
+	p := Part2{
+		lines: lines,
+		value: 0,
+	}
+	return &p
+}
+
+func (p *Part2) Value() int {
+	return p.value
+}
+
+func (p *Part2) Solve() {
+	for _, line := range p.lines {
+		p.value += extractCalibrationValue(line, true)
+	}
+}
+
+func extractCalibrationValue(input string, includeSpelled bool) int {
 	value := 0
 	var digits []int
 
@@ -24,8 +59,10 @@ func extractCalibrationValue(input string) (int, error) {
 		if digit, isDigit := isDigit((input)[i]); isDigit {
 			digits = append(digits, digit)
 		}
-		if digit, isDigit := isSpelledDigit(input, i); isDigit {
-			digits = append(digits, digit)
+		if includeSpelled {
+			if digit, isDigit := isSpelledDigit(input, i); isDigit {
+				digits = append(digits, digit)
+			}
 		}
 	}
 
@@ -33,7 +70,7 @@ func extractCalibrationValue(input string) (int, error) {
 	value += digits[0] * 10
 	value += digits[len(digits)-1]
 
-	return value, nil
+	return value
 }
 
 func isDigit(char byte) (int, bool) {

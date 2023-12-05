@@ -1,9 +1,14 @@
-package readaoc
+package aoc
 
 import (
 	"bufio"
 	"os"
 )
+
+type Solver interface {
+	Solve()
+	Value() int
+}
 
 func ReadAocInput(path string) (lines []string) {
 	file, err := os.Open(path)

@@ -3,13 +3,14 @@ package day3
 import (
 	"fmt"
 	"strconv"
+
+	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-type Day3Aoc interface {
-	Lines() []string
-	Value() int
-	AddValue(int)
+type Solver interface { // Extends aoc.Solver
 	Calculate(int, int, int) bool
+	Lines() []string
+	aoc.Solver
 }
 
 type NumberToken struct {
@@ -48,6 +49,10 @@ func (p *Part1) AddValue(val int) {
 	p.value += val
 }
 
+func (p *Part1) Solve() {
+	solve(p)
+}
+
 func NewPart2(lines []string) *Part2 {
 	p := Part2{
 		lines:         lines,
@@ -71,8 +76,8 @@ func (p *Part2) Value() int {
 	return val
 }
 
-func (p *Part2) AddValue(val int) {
-	// no-op to fit within the interface
+func (p *Part2) Solve() {
+	solve(p)
 }
 
 func (p *Part2) AddGear(key string, value int) {
@@ -86,14 +91,13 @@ func (p *Part2) PossibleGears() map[string][]int {
 	return p.possibleGears
 }
 
-func Answer(aoc Day3Aoc) int {
-	for line := 0; line < len(aoc.Lines()); line++ {
-		tokens := parseLine(aoc.Lines()[line])
-		for i := 0; i < len(tokens); i++ {
-			calculateSymbols(aoc, tokens[i], line)
+func solve(solver Solver) {
+	for i, line := range solver.Lines() {
+		tokens := parseLine(line)
+		for _, token := range tokens {
+			calculateSymbols(solver, token, i)
 		}
 	}
-	return aoc.Value()
 }
 
 func parseLine(line string) (tokens []NumberToken) {
@@ -124,7 +128,7 @@ func (p *Part2) Calculate(i int, j int, val int) bool {
 	return false // Always return false, we want to find all possible options for part 2
 }
 
-func calculateSymbols(aoc Day3Aoc, input NumberToken, line int) bool {
+func calculateSymbols(solver Solver, input NumberToken, line int) bool {
 	startCol := input.Start - 1
 	if startCol < 0 {
 		startCol = 0
@@ -134,14 +138,14 @@ func calculateSymbols(aoc Day3Aoc, input NumberToken, line int) bool {
 	// Iterate through all characters we might care about:
 	// One line above, one line below, one char to the left, one char to the right
 	for i := line - 1; i <= line+1; i++ {
-		if i < 0 || i >= len(aoc.Lines()) {
+		if i < 0 || i >= len(solver.Lines()) {
 			continue
 		}
-		if endCol == len(aoc.Lines()[i]) {
+		if endCol == len(solver.Lines()[i]) {
 			endCol--
 		}
 		for j := startCol; j <= endCol; j++ {
-			if aoc.Calculate(i, j, input.Number) {
+			if solver.Calculate(i, j, input.Number) {
 				return true
 			}
 		}

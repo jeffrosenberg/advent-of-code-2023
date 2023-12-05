@@ -1,18 +1,59 @@
 package main
 
 import (
+	"os"
+
+	day1 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day1"
+	day2 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day2"
+	day3 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day3"
 	day4 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day4"
-	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/readaoc"
+	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-type Puzzle interface {
-	Lines() []string
-	Solve()
-	Value() int
-}
+const DAY string = "4"
+const PART string = "1"
 
 func main() {
-	var puzzle Puzzle = day4.NewPart1(readaoc.ReadAocInput("inputs/4.txt"))
-	puzzle.Solve()
-	println(puzzle.Value())
+	args := os.Args[1:]
+	solver := getSolver(args)
+	solver.Solve()
+	println(solver.Value())
+}
+
+func getSolver(args []string) aoc.Solver {
+	var day, part string
+	if len(args) > 0 {
+		day = args[0]
+		if len(args) > 1 {
+			part = args[1]
+		}
+	}
+	if day == "" {
+		day = DAY
+	}
+	if part == "" {
+		part = PART
+	}
+
+	// TODO: I'm sure this can be much more elegant,
+	// but I don't know how in Go!
+	switch {
+	case day == "1" && part == "1":
+		return day1.NewPart1(aoc.ReadAocInput("inputs/1.txt"))
+	case day == "1" && part == "2":
+		return day1.NewPart2(aoc.ReadAocInput("inputs/1.txt"))
+	case day == "2" && part == "1":
+		return day2.NewPart1(aoc.ReadAocInput("inputs/2.txt"))
+	case day == "2" && part == "2":
+		return day2.NewPart2(aoc.ReadAocInput("inputs/2.txt"))
+	case day == "3" && part == "1":
+		return day3.NewPart1(aoc.ReadAocInput("inputs/3.txt"))
+	case day == "3" && part == "2":
+		return day3.NewPart2(aoc.ReadAocInput("inputs/3.txt"))
+	case day == "4" && part == "1":
+	default:
+		return day4.NewPart1(aoc.ReadAocInput("inputs/4.txt"))
+	}
+
+	return day4.NewPart1(aoc.ReadAocInput("inputs/4.txt"))
 }

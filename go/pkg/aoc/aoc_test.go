@@ -1,4 +1,4 @@
-package readaoc
+package aoc
 
 import (
 	"testing"

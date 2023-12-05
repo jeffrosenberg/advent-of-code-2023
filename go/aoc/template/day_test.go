@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMyTestName(t *testing.T) {
+func TestName(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string // TODO: modify
