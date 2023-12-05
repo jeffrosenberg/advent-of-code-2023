@@ -10,62 +10,83 @@ type Card struct {
 	winners  map[int]bool
 	given    []int
 	matches  int
+	copies   int
 }
 
 type Part1 struct {
 	lines []string
-	value int
+	cards []Card
 }
 
 type Part2 struct {
 	lines []string
-	value int
+	cards []Card
 }
 
 func NewPart1(lines []string) *Part1 {
 	p := Part1{
 		lines: lines,
-		value: 0,
 	}
 	return &p
 }
 
 func (p *Part1) Value() int {
-	return p.value
-}
-
-func (p *Part1) AddValue(val int) {
-	p.value += val
+	val := 0
+	for _, card := range p.cards {
+		if card.matches == 0 {
+			continue
+		}
+		val += power(2, (card.matches - 1))
+	}
+	return val
 }
 
 func (p *Part1) Solve() {
 	for _, line := range p.lines {
 		card := parse(line)
-		card.CalculateMatches()
-		if card.matches == 0 {
-			continue
-		}
-		p.value += power(2, (card.matches - 1))
+		card.calculateMatches()
+		p.cards = append(p.cards, card)
 	}
 }
 
 func NewPart2(lines []string) *Part2 {
 	p := Part2{
 		lines: lines,
-		value: 0,
 	}
 	return &p
 }
 
 func (p *Part2) Value() int {
-	return p.value
+	var val int = 0
+	for _, card := range p.cards {
+		val += card.copies
+	}
+	return val
 }
 
 func (p *Part2) Solve() {
-
+	for _, line := range p.lines {
+		card := parse(line)
+		card.calculateMatches()
+		p.cards = append(p.cards, card)
+	}
+	p.generateCopies()
 }
 
-func (card *Card) CalculateMatches() {
+// TODO: better solution using recursion?
+func (p *Part2) generateCopies() {
+	for i := 0; i < len(p.cards); i++ {
+		p.cards[i].copies++ // 1 copy to denote self
+		if p.cards[i].matches > 0 {
+			// Add copies to n subsequent cards
+			for j := i + 1; j < (i+1)+p.cards[i].matches && j < len(p.cards); j++ {
+				p.cards[j].copies += p.cards[i].copies
+			}
+		}
+	}
+}
+
+func (card *Card) calculateMatches() {
 	for _, g := range card.given {
 		if _, match := card.winners[g]; match {
 			card.winners[g] = true

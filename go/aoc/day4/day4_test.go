@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSolve(t *testing.T) {
+func TestSolvePart1(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    []string
@@ -48,6 +48,94 @@ func TestSolve(t *testing.T) {
 			s := NewPart1(test.input)
 			s.Solve()
 			assert.Equal(t, test.expected, s.Value())
+		})
+	}
+}
+
+func TestGenerateCopies(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    *Part2
+		expected []int
+		skip     bool
+	}{
+		{
+			name: "Simple test",
+			input: &Part2{
+				cards: []Card{
+					Card{
+						cardName: "Card 1",
+						matches:  4,
+					},
+					Card{
+						cardName: "Card 2",
+						matches:  2,
+					},
+				},
+			},
+			expected: []int{1, 2},
+		},
+		{
+			name: "Full test",
+			input: &Part2{
+				cards: []Card{
+					Card{
+						cardName: "Card 1",
+						winners: map[int]bool{
+							41: false,
+							48: false,
+							83: false,
+							86: false,
+							17: false,
+						},
+						given:   []int{83, 86, 6, 31, 17, 9, 48, 53},
+						matches: 4,
+					},
+					Card{
+						cardName: "Card 2",
+						winners: map[int]bool{
+							13: false,
+							32: false,
+							20: false,
+							16: false,
+							61: false,
+						},
+						given:   []int{61, 30, 68, 82, 17, 32, 24, 19},
+						matches: 2,
+					},
+					Card{
+						cardName: "Card 3",
+						matches:  2,
+					},
+					Card{
+						cardName: "Card 4",
+						matches:  1,
+					},
+					Card{
+						cardName: "Card 5",
+						matches:  0,
+					},
+					Card{
+						cardName: "Card 6",
+						matches:  0,
+					},
+				},
+			},
+			expected: []int{1, 2, 4, 8, 14, 1},
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			test.input.generateCopies()
+			for i, exp := range test.expected {
+				assert.Equal(t, exp, test.input.cards[i].copies)
+			}
 		})
 	}
 }
@@ -113,7 +201,7 @@ func TestCalculateMatches(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			test.input.CalculateMatches()
+			test.input.calculateMatches()
 			assert.Equal(t, test.expected, test.input.matches)
 		})
 	}

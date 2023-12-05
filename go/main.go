@@ -51,8 +51,9 @@ func getSolver(args []string) aoc.Solver {
 	case day == "3" && part == "2":
 		return day3.NewPart2(aoc.ReadAocInput("inputs/3.txt"))
 	case day == "4" && part == "1":
-	default:
 		return day4.NewPart1(aoc.ReadAocInput("inputs/4.txt"))
+	case day == "4" && part == "2":
+		return day4.NewPart2(aoc.ReadAocInput("inputs/4.txt"))
 	}
 
 	return day4.NewPart1(aoc.ReadAocInput("inputs/4.txt"))
