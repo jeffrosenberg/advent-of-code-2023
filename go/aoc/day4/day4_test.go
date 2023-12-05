@@ -55,13 +55,13 @@ func TestSolve(t *testing.T) {
 func TestCalculateMatches(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    Line
+		input    Card
 		expected int
 		skip     bool
 	}{
 		{
 			name: "Card 1",
-			input: Line{
+			input: Card{
 				cardName: "Card 1",
 				winners: map[int]bool{
 					41: false,
@@ -76,7 +76,7 @@ func TestCalculateMatches(t *testing.T) {
 		},
 		{
 			name: "Card 2",
-			input: Line{
+			input: Card{
 				cardName: "Card 2",
 				winners: map[int]bool{
 					13: false,
@@ -91,7 +91,7 @@ func TestCalculateMatches(t *testing.T) {
 		},
 		{
 			name: "Card 5",
-			input: Line{
+			input: Card{
 				cardName: "Card 5",
 				winners: map[int]bool{
 					87: false,
@@ -123,13 +123,13 @@ func TestParse(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    string
-		expected Line
+		expected Card
 		skip     bool
 	}{
 		{
 			name:  "Card 1",
 			input: "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
-			expected: Line{
+			expected: Card{
 				cardName: "Card 1",
 				winners: map[int]bool{
 					41: false,
@@ -144,7 +144,7 @@ func TestParse(t *testing.T) {
 		{
 			name:  "Card 2",
 			input: "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19",
-			expected: Line{
+			expected: Card{
 				cardName: "Card 2",
 				winners: map[int]bool{
 					13: false,
@@ -159,7 +159,7 @@ func TestParse(t *testing.T) {
 		{
 			name:  "Card 3",
 			input: "Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1",
-			expected: Line{
+			expected: Card{
 				cardName: "Card 3",
 				winners: map[int]bool{
 					1:  false,

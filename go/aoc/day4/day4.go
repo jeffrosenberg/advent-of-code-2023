@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Line struct {
+type Card struct {
 	cardName string
 	winners  map[int]bool
 	given    []int
@@ -40,12 +40,12 @@ func (p *Part1) AddValue(val int) {
 
 func (p *Part1) Solve() {
 	for _, line := range p.lines {
-		parsedLine := parse(line)
-		parsedLine.CalculateMatches()
-		if parsedLine.matches == 0 {
+		card := parse(line)
+		card.CalculateMatches()
+		if card.matches == 0 {
 			continue
 		}
-		p.AddValue(power(2, (parsedLine.matches - 1)))
+		p.value += power(2, (card.matches - 1))
 	}
 }
 
@@ -61,25 +61,21 @@ func (p *Part2) Value() int {
 	return p.value
 }
 
-func (p *Part2) AddValue(val int) {
-	p.value += val
-}
-
 func (p *Part2) Solve() {
 
 }
 
-func (line *Line) CalculateMatches() {
-	for _, g := range line.given {
-		if _, match := line.winners[g]; match {
-			line.winners[g] = true
-			line.matches++
+func (card *Card) CalculateMatches() {
+	for _, g := range card.given {
+		if _, match := card.winners[g]; match {
+			card.winners[g] = true
+			card.matches++
 		}
 	}
 }
 
-func parse(line string) Line {
-	output := Line{
+func parse(line string) Card {
+	output := Card{
 		winners: map[int]bool{},
 		given:   []int{},
 	}
