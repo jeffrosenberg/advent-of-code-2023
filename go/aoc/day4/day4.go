@@ -1,8 +1,9 @@
 package day4
 
 import (
-	"strconv"
 	"strings"
+
+	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
 type Card struct {
@@ -104,12 +105,12 @@ func parse(line string) Card {
 		output.cardName = name
 		if winners, given, success := strings.Cut(contents, "|"); success {
 			for _, token := range strings.Split(winners, " ") {
-				if winner, isInt := convertInt(token); isInt {
+				if winner, isInt := aoc.ConvertInt(token); isInt {
 					output.winners[winner] = false // Mark all false until a match is made
 				}
 			}
 			for _, token := range strings.Split(given, " ") {
-				if given, isInt := convertInt(token); isInt {
+				if given, isInt := aoc.ConvertInt(token); isInt {
 					output.given = append(output.given, given)
 				}
 			}
@@ -117,17 +118,6 @@ func parse(line string) Card {
 		}
 	}
 	panic("Line in unexpected format!")
-}
-
-func convertInt(val string) (int, bool) {
-	if val == "" {
-		return 0, false
-	}
-	output, err := strconv.Atoi(val)
-	if err != nil {
-		panic(err)
-	}
-	return output, true
 }
 
 func power(n, m int) int { // a power function that accepts and returns ints
