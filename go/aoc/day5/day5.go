@@ -1,50 +1,62 @@
 package day5
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-type Part1 struct {
+type day5 struct {
 	lines []string
 	value int
-	seeds []int
 	maps  []map[int]int
 	keys  [][]int // cache map keys for sorting
 }
 
+type Part1 struct {
+	seeds []int
+	d     *day5
+}
+
+type seedRange struct {
+	start int
+	end   int
+}
+
 type Part2 struct {
-	lines []string
-	value int
+	seeds []seedRange
+	d     *day5
 }
 
 func NewPart1(lines []string) *Part1 {
 	p := Part1{
-		lines: lines,
-		value: 0,
 		seeds: []int{},
-		maps: []map[int]int{
-			{0: 0},
+		d: &day5{
+			lines: lines,
+			value: 0,
+			maps: []map[int]int{
+				{0: 0},
+			},
+			keys: [][]int{{0}},
 		},
-		keys: [][]int{{0}},
 	}
 	return &p
 }
 
-func (p *Part1) traverse(seed int) int {
-	return p.traverse_step(seed, 0)
+func (d *day5) traverse(seed int) int {
+	return d.traverse_step(seed, 0)
 }
 
-func (p *Part1) traverse_step(in int, idx int) int {
-	if idx >= len(p.maps) {
+func (d *day5) traverse_step(in int, idx int) int {
+	if idx >= len(d.maps) {
 		return in
 	}
-	currentMap := p.maps[idx]
-	currentKeys := p.keys[idx]
+	currentMap := d.maps[idx]
+	currentKeys := d.keys[idx]
 	dest := getDestination(in, currentMap, currentKeys)
-	return p.traverse_step(dest, idx+1)
+	return d.traverse_step(dest, idx+1)
 }
 
 func getDestination(in int, currentMap map[int]int, currentKeys []int) int {
@@ -67,72 +79,103 @@ func getDestination(in int, currentMap map[int]int, currentKeys []int) int {
 	return in + adjustment
 }
 
-func (p *Part1) parse() {
-	seedLine := p.lines[0]
-	if _, nums, ok := strings.Cut(seedLine, ":"); ok {
+func (p *Part1) parseSeedLine() {
+	seedLine := p.d.lines[0]
+	if _, nums, ok := strings.Cut(seedLine, ": "); ok {
 		for _, num := range strings.Split(nums, " ") {
-			if num == " " {
-				continue
-			}
 			if parsedNum, isInt := aoc.ConvertInt(num); isInt {
 				p.seeds = append(p.seeds, parsedNum)
 			}
 		}
 	}
+}
 
+func (d *day5) parseMaps() {
 	currentMap := -1 // HACK: We're going to add 1 each time, so start at -1
-	for i := 1; i < len(p.lines); i++ {
-		line := p.lines[i]
+	for i := 1; i < len(d.lines); i++ {
+		line := d.lines[i]
 		if len(line) == 0 {
 			continue
 		} else if strings.Contains(line, "map:") {
-			p.maps = append(p.maps, map[int]int{})
-			p.keys = append(p.keys, []int{})
+			d.maps = append(d.maps, map[int]int{})
+			d.keys = append(d.keys, []int{})
 			currentMap++
 			continue
 		} else {
-			cachedKeys := buildMap(line, p.maps[currentMap], p.keys[currentMap])
-			p.keys[currentMap] = cachedKeys
+			cachedKeys := buildMap(line, d.maps[currentMap], d.keys[currentMap])
+			d.keys[currentMap] = cachedKeys
 		}
 	}
 }
 
 func (p *Part1) Value() int {
-	return p.value
+	return p.d.value
 }
 
 func (p *Part1) Solve() {
-	p.parse()
+	p.parseSeedLine()
+	p.d.parseMaps()
 	for _, seed := range p.seeds {
-		seedVal := p.traverse(seed)
-		if seedVal < p.value || p.value == 0 {
-			p.value = seedVal
+		seedVal := p.d.traverse(seed)
+		if seedVal < p.d.value || p.d.value == 0 {
+			p.d.value = seedVal
 		}
 	}
 }
 
 func NewPart2(lines []string) *Part2 {
 	p := Part2{
-		lines: lines,
-		value: 0,
+		seeds: []seedRange{},
+		d: &day5{
+			lines: lines,
+			value: 0,
+			maps: []map[int]int{
+				{0: 0},
+			},
+			keys: [][]int{{0}},
+		},
 	}
 	return &p
 }
 
-func (p *Part2) Lines() []string {
-	return p.lines
+func (p *Part2) parseSeedLine() {
+	seedLine := p.d.lines[0]
+	if _, nums, ok := strings.Cut(seedLine, ": "); ok {
+		var startNum int
+		for i, num := range strings.Split(nums, " ") {
+			if i%2 == 0 {
+				if parsedNum, isInt := aoc.ConvertInt(num); isInt {
+					startNum = parsedNum
+				}
+			} else {
+				if rng, isInt := aoc.ConvertInt(num); isInt {
+					p.seeds = append(p.seeds, seedRange{start: startNum, end: startNum + rng})
+				}
+			}
+		}
+	}
 }
 
 func (p *Part2) Value() int {
-	return p.value
+	return p.d.value
 }
 
-func (p *Part2) AddValue(val int) {
-	p.value += val
-}
-
+// This is crazy slow.
+// Given the large numbers involved, I don't know how to make it fast,
+// although presumably there's a way to do it...
+// Most likely I wasn't supposed to traverse all of these, but figure out a shortcut?
 func (p *Part2) Solve() {
-	// TODO
+	p.parseSeedLine()
+	p.d.parseMaps()
+	for _, rng := range p.seeds {
+		println(fmt.Sprintf("Processing %d - %d range...", rng.start, rng.end))
+		for seed := rng.start; seed < rng.end; seed++ {
+			seedVal := p.d.traverse(seed)
+			if seedVal < p.d.value || p.d.value == 0 {
+				p.d.value = seedVal
+			}
+		}
+	}
 }
 
 func buildMap(input string, targetMap map[int]int, targetKeys []int) []int {

@@ -39,8 +39,9 @@ func TestTraverse(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			p.parse()
-			got := p.traverse(test.input)
+			p.parseSeedLine()
+			p.d.parseMaps()
+			got := p.d.traverse(test.input)
 			assert.Equal(t, test.expected, got)
 		})
 	}
@@ -96,7 +97,7 @@ func TestGetDestination(t *testing.T) {
 	}
 }
 
-func TestParse(t *testing.T) {
+func TestParsePart1(t *testing.T) {
 	expectedSeeds := []int{79, 14, 55, 13}
 	expectedSeedToSoilMap := map[int]int{
 		0:   0,
@@ -110,10 +111,21 @@ func TestParse(t *testing.T) {
 		70: 0,
 	}
 	p := NewPart1(aoc.ReadAocInput("../../../inputs/5_test.txt"))
-	p.parse()
+	p.parseSeedLine()
+	p.d.parseMaps()
 	assert.Equal(t, expectedSeeds, p.seeds)
-	assert.Equal(t, expectedSeedToSoilMap, p.maps[0])
-	assert.Equal(t, expectedTemperatureToHumidityMap, p.maps[5])
+	assert.Equal(t, expectedSeedToSoilMap, p.d.maps[0])
+	assert.Equal(t, expectedTemperatureToHumidityMap, p.d.maps[5])
+}
+
+func TestParsePart2(t *testing.T) {
+	expectedSeeds := []seedRange{
+		{start: 79, end: 93},
+		{start: 55, end: 68},
+	}
+	p := NewPart2(aoc.ReadAocInput("../../../inputs/5_test.txt"))
+	p.parseSeedLine()
+	assert.Equal(t, expectedSeeds, p.seeds)
 }
 
 func TestBuildMap(t *testing.T) {
