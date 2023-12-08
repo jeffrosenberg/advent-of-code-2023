@@ -3,7 +3,6 @@ package day2
 import (
 	"bufio"
 	"errors"
-	"math"
 	"strconv"
 	"strings"
 
@@ -111,7 +110,7 @@ func (p *Part2) Solve() {
 			if color == "" && num == 0 {
 				break
 			}
-			max[color] = int(math.Max(float64(max[color]), float64(num)))
+			max[color] = aoc.Max(max[color], num)
 		}
 
 		p.value += (max["red"] * max["green"] * max["blue"])

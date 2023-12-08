@@ -10,10 +10,11 @@ import (
 	day4 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day4"
 	day5 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day5"
 	day6 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day6"
+	day7 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day7"
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-const DAY string = "5"
+const DAY string = "7"
 const PART string = "1"
 
 func main() {
@@ -41,6 +42,7 @@ func getSolver(args []string) aoc.Solver {
 
 	// TODO: I'm sure this can be much more elegant,
 	// but I don't know how in Go!
+	// Something something reflection?
 	switch {
 	case day == "1" && part == "1":
 		return day1.NewPart1(aoc.ReadAocInput(path))
@@ -66,7 +68,11 @@ func getSolver(args []string) aoc.Solver {
 		return day6.NewPart1(aoc.ReadAocInput(path))
 	case day == "6" && part == "2":
 		return day6.NewPart2(aoc.ReadAocInput(path))
+	case day == "7" && part == "1":
+		return day7.NewPart1(aoc.ReadAocInput(path))
+	case day == "7" && part == "2":
+		return day7.NewPart2(aoc.ReadAocInput(path))
+	default:
+		return day7.NewPart1(aoc.ReadAocInput(path))
 	}
-
-	return day5.NewPart1(aoc.ReadAocInput(path))
 }

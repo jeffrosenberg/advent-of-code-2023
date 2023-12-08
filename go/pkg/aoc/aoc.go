@@ -40,3 +40,23 @@ func ConvertInt(val string) (int, bool) {
 	}
 	return output, true
 }
+
+func Min(a, b int) int {
+	// This is a built-in in Go 1.21,
+	// but my OS currently ships Go 1.20 :-(
+
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func Max(a, b int) int {
+	// This is a built-in in Go 1.21,
+	// but my OS currently ships Go 1.20 :-(
+
+	if a > b {
+		return a
+	}
+	return b
+}
