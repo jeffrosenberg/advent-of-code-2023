@@ -7,9 +7,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTraverse(t *testing.T) {
+func TestTraversePart1(t *testing.T) {
 	tests := []struct {
 		name         string
+		p            *Part1
 		nodes        map[string]node
 		instructions string
 		start        string
@@ -18,27 +19,33 @@ func TestTraverse(t *testing.T) {
 	}{
 		{
 			name: "RL example",
-			nodes: map[string]node{
-				"AAA": {left: "BBB", right: "CCC"},
-				"BBB": {left: "DDD", right: "EEE"},
-				"CCC": {left: "ZZZ", right: "GGG"},
-				"DDD": {left: "DDD", right: "DDD"},
-				"EEE": {left: "EEE", right: "EEE"},
-				"GGG": {left: "GGG", right: "GGG"},
-				"ZZZ": {left: "ZZZ", right: "ZZZ"},
+			p: &Part1{
+				nodes: map[string]node{
+					"AAA": {left: "BBB", right: "CCC"},
+					"BBB": {left: "DDD", right: "EEE"},
+					"CCC": {left: "ZZZ", right: "GGG"},
+					"DDD": {left: "DDD", right: "DDD"},
+					"EEE": {left: "EEE", right: "EEE"},
+					"GGG": {left: "GGG", right: "GGG"},
+					"ZZZ": {left: "ZZZ", right: "ZZZ"},
+				},
+				instructions: "RL",
+				startNodes:   []string{"AAA"},
 			},
-			instructions: "RL",
-			expected:     2,
+			expected: 2,
 		},
 		{
 			name: "LLR example",
-			nodes: map[string]node{
-				"AAA": {left: "BBB", right: "BBB"},
-				"BBB": {left: "AAA", right: "ZZZ"},
-				"ZZZ": {left: "ZZZ", right: "ZZZ"},
+			p: &Part1{
+				nodes: map[string]node{
+					"AAA": {left: "BBB", right: "BBB"},
+					"BBB": {left: "AAA", right: "ZZZ"},
+					"ZZZ": {left: "ZZZ", right: "ZZZ"},
+				},
+				instructions: "LLR",
+				startNodes:   []string{"AAA"},
 			},
-			instructions: "LLR",
-			expected:     6,
+			expected: 6,
 		},
 	}
 
@@ -49,7 +56,7 @@ func TestTraverse(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			got := traverse(test.nodes, test.instructions)
+			got := traverse(test.p)
 			assert.Equal(t, test.expected, got)
 		})
 	}
@@ -67,9 +74,11 @@ func TestParse(t *testing.T) {
 		"GGG": {left: "GGG", right: "GGG"},
 		"ZZZ": {left: "ZZZ", right: "ZZZ"},
 	}
-	i, n := parse(p)
+	expectedStart := []string{"AAA"}
+	i, n, s := parse(p)
 	assert.Equal(t, i, expectedInstructions)
 	assert.Equal(t, n, expectedNodes)
+	assert.Equal(t, s, expectedStart)
 }
 
 func TestParseLine(t *testing.T) {

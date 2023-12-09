@@ -6,11 +6,12 @@ import (
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-const START = "AAA"
-const GOAL = "ZZZ"
-
 type Solver interface { // Extends aoc.Solver
-	AddValue(int)
+	isStartNode(string) bool
+	isEndNode(string) bool
+	Instructions() []rune
+	Nodes() map[string]node
+	StartNodes() []string
 	aoc.Solver
 }
 
@@ -24,11 +25,15 @@ type Part1 struct {
 	value        int
 	instructions string
 	nodes        map[string]node
+	startNodes   []string
 }
 
 type Part2 struct {
-	lines []string
-	value int
+	lines        []string
+	value        int
+	instructions string
+	nodes        map[string]node
+	startNodes   []string
 }
 
 func NewPart1(lines []string) *Part1 {
@@ -48,19 +53,36 @@ func (p *Part1) Value() int {
 	return p.value
 }
 
-func (p *Part1) AddValue(val int) {
-	p.value += val
+func (p *Part1) isStartNode(key string) bool {
+	return key == "AAA"
+}
+
+func (p *Part1) isEndNode(key string) bool {
+	return key == "ZZZ"
+}
+
+func (p *Part1) Instructions() []rune {
+	return []rune(p.instructions)
+}
+
+func (p *Part1) Nodes() map[string]node {
+	return p.nodes
+}
+
+func (p *Part1) StartNodes() []string {
+	return p.startNodes
 }
 
 func (p *Part1) Solve() {
-	p.instructions, p.nodes = parse(p)
-	p.value = traverse(p.nodes, p.instructions)
+	p.instructions, p.nodes, p.startNodes = parse(p)
+	p.value = traverse(p)
 }
 
 func NewPart2(lines []string) *Part2 {
 	p := Part2{
 		lines: lines,
 		value: 0,
+		nodes: map[string]node{},
 	}
 	return &p
 }
@@ -73,20 +95,37 @@ func (p *Part2) Value() int {
 	return p.value
 }
 
-func (p *Part2) AddValue(val int) {
-	p.value += val
+func (p *Part2) isStartNode(key string) bool {
+	return key[2] == byte('A')
+}
+
+func (p *Part2) isEndNode(key string) bool {
+	return key[2] == byte('Z')
+}
+
+func (p *Part2) Instructions() []rune {
+	return []rune(p.instructions)
+}
+
+func (p *Part2) Nodes() map[string]node {
+	return p.nodes
+}
+
+func (p *Part2) StartNodes() []string {
+	return p.startNodes
 }
 
 func (p *Part2) Solve() {
-	// TODO
+	p.instructions, p.nodes, p.startNodes = parse(p)
 }
 
-func traverse(nodes map[string]node, instructions string) (steps int) {
-	instr := []rune(instructions)
+func traverse(solver Solver) (steps int) {
+	instr := solver.Instructions()
 	len_instr := len(instr)
-	var currentNode string = START
+	nodes := solver.Nodes()
+	currentNode := solver.StartNodes()[0]
 
-	for currentNode != GOAL {
+	for !solver.isEndNode(currentNode) {
 		theNode := nodes[currentNode]
 		instruction := instr[steps%len_instr]
 		if instruction == 'L' {
@@ -100,7 +139,7 @@ func traverse(nodes map[string]node, instructions string) (steps int) {
 	return
 }
 
-func parse(solver Solver) (instructions string, nodes map[string]node) {
+func parse(solver Solver) (instructions string, nodes map[string]node, startNodes []string) {
 	nodes = map[string]node{}
 	for i, line := range solver.Lines() {
 		if i == 0 {
@@ -110,6 +149,9 @@ func parse(solver Solver) (instructions string, nodes map[string]node) {
 		} else {
 			k, n := parseLine(line)
 			nodes[k] = n
+			if solver.isStartNode(k) {
+				startNodes = append(startNodes, k)
+			}
 		}
 	}
 	return
