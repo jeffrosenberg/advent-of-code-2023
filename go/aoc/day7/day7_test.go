@@ -7,10 +7,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSolve(t *testing.T) {
+func TestSolvePart1(t *testing.T) {
 	expected := 6440
 
 	p := NewPart1(aoc.ReadAocInput("../../../inputs/7_test.txt"))
+	p.Solve()
+
+	assert.Equal(t, expected, p.Value())
+}
+
+func TestSolvePart2(t *testing.T) {
+	expected := 5905
+
+	p := NewPart2(aoc.ReadAocInput("../../../inputs/7_test.txt"))
 	p.Solve()
 
 	assert.Equal(t, expected, p.Value())
@@ -191,6 +200,57 @@ func TestCalculateStrengthPart1(t *testing.T) {
 	}
 
 	p := NewPart1([]string{}) // Don't actually care about any values here
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			test.inputHand.calculateStrength(p.faceValues(), p.calculateHandType)
+			assert.Equal(t, test.expected, test.inputHand.strength)
+		})
+	}
+}
+
+func TestCalculateStrengthPart2(t *testing.T) {
+	tests := []struct {
+		name      string
+		inputHand hand
+		expected  string
+		skip      bool
+	}{
+		{
+			name: "First example - pair",
+			inputHand: hand{
+				cards: "32T3K",
+			},
+			expected: "232A3D",
+		},
+		{
+			name: "Second example - four of a kind",
+			inputHand: hand{
+				cards: "T55J5",
+			},
+			expected: "6A5515",
+		},
+		{
+			name: "Third example - two pair",
+			inputHand: hand{
+				cards: "KK677",
+			},
+			expected: "3DD677",
+		},
+		{
+			name: "Five of a kind",
+			inputHand: hand{
+				cards: "QQQJJ",
+			},
+			expected: "7CCC11",
+		},
+	}
+
+	p := NewPart2([]string{}) // Don't actually care about any values here
 	for _, test := range tests {
 		if test.skip {
 			t.Skipf("Skipping %s", string(test.name))

@@ -145,6 +145,42 @@ func NewPart2(lines []string) *Part2 {
 	return &p
 }
 
+func (p *Part2) addHand(h hand) {
+	p.hands = append(p.hands, h)
+}
+
+func (p *Part2) faceValues() map[rune]rune {
+	return map[rune]rune{
+		'T': 'A',
+		'J': '1', // Change from part 1
+		'Q': 'C',
+		'K': 'D',
+		'A': 'E',
+	}
+}
+
+func (p *Part2) calculateHandType(cardsInHand map[rune]int) rune {
+	qtys := []int{}
+	var jokers int
+	for card, qty := range cardsInHand {
+		if card == 'J' {
+			// Change from part 1
+			// Save any jokers and add them to the greatest remaining qty
+			jokers = qty
+		} else {
+			qtys = append(qtys, qty)
+		}
+	}
+	sort.Ints(qtys)
+	if jokers == 5 {
+		qtys = append(qtys, 5)
+	} else if jokers > 0 {
+		qtys[len(qtys)-1] += jokers
+	}
+
+	return calculateHandType(qtys)
+}
+
 func (p *Part2) Lines() []string {
 	return p.lines
 }
@@ -153,7 +189,13 @@ func (p *Part2) Value() int {
 }
 
 func (p *Part2) Solve() {
-	// TODO
+	parse(p)
+	sortByStrength(p.hands)
+
+	// Once sorted, loop through and multiple bid * rank
+	for i, hand := range p.hands {
+		p.value += ((i + 1) * hand.bid)
+	}
 }
 
 func parse(solver solver) {
