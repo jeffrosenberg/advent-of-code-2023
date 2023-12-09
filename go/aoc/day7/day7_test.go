@@ -92,7 +92,7 @@ func TestSort(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			test.input.sortByStrength()
+			sortByStrength(test.input.hands)
 			for i, exp := range test.expected {
 				assert.Equal(t, exp, test.input.hands[i].cards)
 			}
@@ -103,13 +103,13 @@ func TestSort(t *testing.T) {
 func TestParse(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    string
+		input    []string
 		expected hand
 		skip     bool
 	}{
 		{
 			name:  "First example",
-			input: "32T3K 765",
+			input: []string{"32T3K 765"},
 			expected: hand{
 				cards:    "32T3K",
 				bid:      765,
@@ -119,7 +119,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:  "Second example",
-			input: "T55J5 684",
+			input: []string{"T55J5 684"},
 			expected: hand{
 				cards:    "T55J5",
 				bid:      684,
@@ -129,7 +129,7 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name:  "Fifth example",
-			input: "QQQJA 483",
+			input: []string{"QQQJA 483"},
 			expected: hand{
 				cards:    "QQQJA",
 				bid:      483,
@@ -146,13 +146,14 @@ func TestParse(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			got := parse(test.input)
-			assert.Equal(t, test.expected, got)
+			p := NewPart1(test.input)
+			parse(p)
+			assert.Equal(t, test.expected, p.hands[0])
 		})
 	}
 }
 
-func TestCalculateStrength(t *testing.T) {
+func TestCalculateStrengthPart1(t *testing.T) {
 	tests := []struct {
 		name      string
 		inputHand hand
@@ -189,6 +190,7 @@ func TestCalculateStrength(t *testing.T) {
 		},
 	}
 
+	p := NewPart1([]string{}) // Don't actually care about any values here
 	for _, test := range tests {
 		if test.skip {
 			t.Skipf("Skipping %s", string(test.name))
@@ -196,7 +198,7 @@ func TestCalculateStrength(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			test.inputHand.calculateStrength()
+			test.inputHand.calculateStrength(p.faceValues(), p.calculateHandType)
 			assert.Equal(t, test.expected, test.inputHand.strength)
 		})
 	}

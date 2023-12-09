@@ -4,6 +4,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
 type hand struct {
@@ -35,6 +37,13 @@ I'm going to solve this by calculating "strength" as a string, as follows:
 		I'll use an arbitrary number that will sort properly
 */
 
+type solver interface { // Extends aoc.Solver
+	addHand(hand)
+	calculateHandType(map[rune]int) rune
+	faceValues() map[rune]rune
+	aoc.Solver
+}
+
 const (
 	HAND_HIGHCARD  = '1'
 	HAND_PAIR      = '2'
@@ -45,15 +54,7 @@ const (
 	HAND_FIVEKIND  = '7'
 )
 
-var faceMap map[rune]rune = map[rune]rune{
-	'T': 'A',
-	'J': 'B',
-	'Q': 'C',
-	'K': 'D',
-	'A': 'E',
-}
-
-func (h *hand) calculateStrength() {
+func (h *hand) calculateStrength(faceMap map[rune]rune, calcFunc func(map[rune]int) rune) {
 	var handBuilder strings.Builder
 	cardsInHand := make(map[rune]int, 5)
 
@@ -69,18 +70,111 @@ func (h *hand) calculateStrength() {
 		cardsInHand[c] += 1
 	}
 
-	h.handType = calculateHandType(cardsInHand)
+	h.handType = calcFunc(cardsInHand)
 	h.strength = string(h.handType)
 	h.strength += handBuilder.String()
 }
 
-func calculateHandType(cardsInHand map[rune]int) rune {
+type Part1 struct {
+	lines []string
+	value int
+	hands []hand
+}
+
+type Part2 struct {
+	lines []string
+	value int
+	hands []hand
+}
+
+func NewPart1(lines []string) *Part1 {
+	p := Part1{
+		lines: lines,
+		hands: []hand{},
+		value: 0,
+	}
+	return &p
+}
+
+func (p *Part1) addHand(h hand) {
+	p.hands = append(p.hands, h)
+}
+
+func (p *Part1) faceValues() map[rune]rune {
+	return map[rune]rune{
+		'T': 'A',
+		'J': 'B',
+		'Q': 'C',
+		'K': 'D',
+		'A': 'E',
+	}
+}
+
+func (p *Part1) calculateHandType(cardsInHand map[rune]int) rune {
 	qtys := []int{}
 	for _, qty := range cardsInHand {
 		qtys = append(qtys, qty)
 	}
 	sort.Ints(qtys)
+	return calculateHandType(qtys)
+}
 
+func (p *Part1) Lines() []string {
+	return p.lines
+}
+
+func (p *Part1) Value() int {
+	return p.value
+}
+
+func (p *Part1) Solve() {
+	parse(p)
+	sortByStrength(p.hands)
+
+	// Once sorted, loop through and multiple bid * rank
+	for i, hand := range p.hands {
+		p.value += ((i + 1) * hand.bid)
+	}
+}
+
+func NewPart2(lines []string) *Part2 {
+	p := Part2{
+		lines: lines,
+		value: 0,
+	}
+	return &p
+}
+
+func (p *Part2) Lines() []string {
+	return p.lines
+}
+func (p *Part2) Value() int {
+	return p.value
+}
+
+func (p *Part2) Solve() {
+	// TODO
+}
+
+func parse(solver solver) {
+	for _, line := range solver.Lines() {
+		if cards, bid, ok := strings.Cut(line, " "); ok {
+			bidInt, err := strconv.Atoi(bid)
+			if err != nil {
+				panic(err)
+			}
+			newHand := hand{
+				bid:   bidInt,
+				cards: cards,
+			}
+
+			newHand.calculateStrength(solver.faceValues(), solver.calculateHandType)
+			solver.addHand(newHand)
+		}
+	}
+}
+
+func calculateHandType(qtys []int) rune {
 	switch len(qtys) {
 	case 5:
 		return HAND_HIGHCARD
@@ -105,89 +199,6 @@ func calculateHandType(cardsInHand map[rune]int) rune {
 	panic("Didn't match hand type")
 }
 
-type Part1 struct {
-	lines []string
-	value int
-	hands []hand
-}
-
-type Part2 struct {
-	lines []string
-	value int
-}
-
-func NewPart1(lines []string) *Part1 {
-	p := Part1{
-		lines: lines,
-		hands: []hand{},
-		value: 0,
-	}
-	return &p
-}
-
-func (p *Part1) Lines() []string {
-	return p.lines
-}
-
-func (p *Part1) Value() int {
-	return p.value
-}
-
-func (p *Part1) Solve() {
-	for _, line := range p.lines {
-		p.hands = append(p.hands, parse(line))
-	}
-	p.sortByStrength()
-
-	// Once sorted, loop through and multiple bid * rank
-	for i, hand := range p.hands {
-		p.value += ((i + 1) * hand.bid)
-	}
-}
-
-func (p *Part1) sortByStrength() {
-	sort.Slice(p.hands, func(i, j int) bool { return p.hands[i].strength < p.hands[j].strength })
-}
-
-func NewPart2(lines []string) *Part2 {
-	p := Part2{
-		lines: lines,
-		value: 0,
-	}
-	return &p
-}
-
-func (p *Part2) Lines() []string {
-	return p.lines
-}
-
-func (p *Part2) Value() int {
-	return p.value
-}
-
-func (p *Part2) AddValue(val int) {
-	p.value += val
-}
-
-func (p *Part2) Solve() {
-	// TODO
-}
-
-func parse(input string) hand {
-	if cards, bid, ok := strings.Cut(input, " "); ok {
-		bidInt, err := strconv.Atoi(bid)
-		if err != nil {
-			panic(err)
-		}
-		newHand := hand{
-			bid:   bidInt,
-			cards: cards,
-		}
-
-		newHand.calculateStrength()
-		return newHand
-	}
-
-	// We should remain within the if block above
-	panic("unable to parse line")
+func sortByStrength(hands []hand) {
+	sort.Slice(hands, func(i, j int) bool { return hands[i].strength < hands[j].strength })
 }

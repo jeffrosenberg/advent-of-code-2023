@@ -108,6 +108,13 @@ func (d *day5) parseMaps() {
 	}
 }
 
+func (d *day5) Lines() []string {
+	return d.lines
+}
+
+func (p *Part1) Lines() []string {
+	return p.d.Lines()
+}
 func (p *Part1) Value() int {
 	return p.d.value
 }
@@ -156,6 +163,9 @@ func (p *Part2) parseSeedLine() {
 	}
 }
 
+func (p *Part2) Lines() []string {
+	return p.d.Lines()
+}
 func (p *Part2) Value() int {
 	return p.d.value
 }

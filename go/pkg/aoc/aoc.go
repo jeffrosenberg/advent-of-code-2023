@@ -7,6 +7,7 @@ import (
 )
 
 type Solver interface {
+	Lines() []string
 	Solve()
 	Value() int
 }

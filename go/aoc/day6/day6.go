@@ -31,6 +31,9 @@ func NewPart1(lines []string) *Part1 {
 	return &p
 }
 
+func (p *Part1) Lines() []string {
+	return nil // not paring the input for day 6
+}
 func (p *Part1) Value() int {
 	return p.value
 }
@@ -56,6 +59,9 @@ func NewPart2(lines []string) *Part2 {
 	return &p
 }
 
+func (p *Part2) Lines() []string {
+	return nil // not paring the input for day 6
+}
 func (p *Part2) Value() int {
 	return p.value
 }
