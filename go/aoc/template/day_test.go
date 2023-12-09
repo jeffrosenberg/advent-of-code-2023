@@ -3,20 +3,28 @@ package dayn
 import (
 	"testing"
 
+	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestName(t *testing.T) {
+func TestParse(t *testing.T) {
+	p := NewPart1(aoc.ReadAocInput("../../../inputs/TODO_test.txt"))
+	expected := []string{"TODO", "TODO"}
+	got := parse(p)
+	assert.Equal(t, expected, got)
+}
+
+func TestParseLine(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    string // TODO: modify
-		expected bool
+		input    string
+		expected any
 		skip     bool
 	}{
 		{
-			name:     "My test name",
+			name:     "TODO",
 			input:    "TODO",
-			expected: false,
+			expected: "TODO",
 		},
 	}
 
@@ -27,7 +35,7 @@ func TestName(t *testing.T) {
 
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
-			got := supportingFunc(test.input)
+			got := parseLine(test.input)
 			assert.Equal(t, test.expected, got)
 		})
 	}
