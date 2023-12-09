@@ -14,6 +14,13 @@ func TestSolvePart1(t *testing.T) {
 	assert.Equal(t, expected, p.Value())
 }
 
+func TestSolvePart2(t *testing.T) {
+	expected := 2
+	p := NewPart2(aoc.ReadAocInput("../../../inputs/9_test.txt"))
+	p.Solve()
+	assert.Equal(t, expected, p.Value())
+}
+
 func TestExtrapolate(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -46,6 +53,43 @@ func TestExtrapolate(t *testing.T) {
 		t.Run(string(test.name), func(t *testing.T) {
 			t.Log(test.name)
 			got := extrapolate(test.input)
+			assert.Equal(t, test.expected, got)
+		})
+	}
+}
+
+func TestExtrapolateBackwards(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []int
+		expected int
+		skip     bool
+	}{
+		{
+			name:     "Example line 1",
+			input:    []int{0, 3, 6, 9, 12, 15},
+			expected: -3,
+		},
+		{
+			name:     "Example line 2",
+			input:    []int{1, 3, 6, 10, 15, 21},
+			expected: 0,
+		},
+		{
+			name:     "Example line 3",
+			input:    []int{10, 13, 16, 21, 30, 45},
+			expected: 5,
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			got := extrapolateBackwards(test.input)
 			assert.Equal(t, test.expected, got)
 		})
 	}

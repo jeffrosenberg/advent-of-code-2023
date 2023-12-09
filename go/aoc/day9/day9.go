@@ -8,9 +8,6 @@ import (
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-type Solver interface { // Extends aoc.Solver
-	aoc.Solver
-}
 type Part1 struct {
 	lines []string
 	value int
@@ -61,7 +58,10 @@ func (p *Part2) Value() int {
 }
 
 func (p *Part2) Solve() {
-	// TODO
+	histories := parse(p)
+	for _, hist := range histories {
+		p.value += extrapolateBackwards(hist)
+	}
 }
 
 func extrapolate(history []int) (next int) {
@@ -77,7 +77,20 @@ func extrapolate(history []int) (next int) {
 	return history[len(history)-1] + nextInterval
 }
 
-func parse(solver Solver) (output [][]int) {
+func extrapolateBackwards(history []int) (prev int) {
+	diffs := []int{}
+	prevInterval := 0
+
+	for i := 1; i < len(history); i++ {
+		diffs = append(diffs, history[i]-history[i-1])
+	}
+	if !(diffs[0] == 0 && diffs[len(diffs)-1] == 0) {
+		prevInterval = extrapolateBackwards(diffs)
+	}
+	return history[0] - prevInterval
+}
+
+func parse(solver aoc.Solver) (output [][]int) {
 	output = [][]int{}
 	for _, line := range solver.Lines() {
 		output = append(output, parseLine(line))
