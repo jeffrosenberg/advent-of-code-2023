@@ -1,6 +1,7 @@
 package day8
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
@@ -117,26 +118,69 @@ func (p *Part2) StartNodes() []string {
 
 func (p *Part2) Solve() {
 	p.instructions, p.nodes, p.startNodes = parse(p)
+	p.value = traverse(p)
 }
 
 func traverse(solver Solver) (steps int) {
+	currentNodes := solver.StartNodes()
+
+	// Set up channels
+	var found chan (int) = make(chan int, 100)
+	var done chan (bool) = make(chan bool)
+	var answer chan (int) = make(chan int, 1)
+
+	// Process and wait for the answer
+	for _, n := range currentNodes {
+		go findEndNodes(solver, n, found, done)
+	}
+	go findMatchingEndNodes(found, len(currentNodes), answer)
+	final := <-answer
+	return final
+}
+
+func findEndNodes(solver Solver, currentNode string, results chan int, done chan bool) {
+	firstNode := currentNode
 	instr := solver.Instructions()
 	len_instr := len(instr)
 	nodes := solver.Nodes()
-	currentNode := solver.StartNodes()[0]
+	steps := 0
 
-	for !solver.isEndNode(currentNode) {
-		theNode := nodes[currentNode]
-		instruction := instr[steps%len_instr]
-		if instruction == 'L' {
-			currentNode = theNode.left
-		} else {
-			currentNode = theNode.right
+	for {
+		select {
+		case <-done:
+			return // quit
+		default:
+			theNode := nodes[currentNode]
+			instruction := instr[steps%len_instr]
+			if instruction == 'L' {
+				currentNode = theNode.left
+			} else {
+				currentNode = theNode.right
+			}
+			steps++
+			if solver.isEndNode(currentNode) {
+				if steps%1000 == 0 {
+					fmt.Printf("%s: Step %d\n", firstNode, steps)
+				}
+				results <- steps
+			}
 		}
-		steps++
 	}
+}
 
-	return
+func findMatchingEndNodes(matches chan int, targetMatches int, answer chan int) {
+	// Add all observed matches to a map to compare
+	resultMap := map[int]int{}
+	for match := range matches {
+		current := resultMap[match]
+		new := current + 1
+		if new == targetMatches {
+			answer <- match
+			return
+		} else {
+			resultMap[match] = new
+		}
+	}
 }
 
 func parse(solver Solver) (instructions string, nodes map[string]node, startNodes []string) {

@@ -7,6 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Doesn't actually test anything,
+// this can be used to debug the solution run.
+// func TestDebug(t *testing.T) {
+// 	p := NewPart2(aoc.ReadAocInput("../../../inputs/8.txt"))
+// 	p.Solve()
+// }
+
 func TestTraversePart1(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -58,6 +65,108 @@ func TestTraversePart1(t *testing.T) {
 			t.Log(test.name)
 			got := traverse(test.p)
 			assert.Equal(t, test.expected, got)
+		})
+	}
+}
+
+func TestTraversePart2(t *testing.T) {
+	tests := []struct {
+		name         string
+		p            *Part2
+		nodes        map[string]node
+		instructions string
+		start        string
+		expected     int
+		skip         bool
+	}{
+		{
+			name: "LR example",
+			p: &Part2{
+				nodes: map[string]node{
+					"11A": {left: "11B", right: "XXX"},
+					"11B": {left: "XXX", right: "11Z"},
+					"11Z": {left: "11B", right: "XXX"},
+					"22A": {left: "22B", right: "XXX"},
+					"22B": {left: "22C", right: "22C"},
+					"22C": {left: "22Z", right: "22Z"},
+					"22Z": {left: "22B", right: "22B"},
+					"XXX": {left: "XXX", right: "XXX"},
+				},
+				instructions: "LR",
+				startNodes:   []string{"11A", "22A"},
+			},
+			expected: 6,
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			got := traverse(test.p)
+			assert.Equal(t, test.expected, got)
+		})
+	}
+}
+
+func TestFindMatchingEndNodes(t *testing.T) {
+	tests := []struct {
+		name         string
+		input        [][]int
+		expectedInt  int
+		expectedBool bool
+		skip         bool
+	}{
+		{
+			name: "No match",
+			input: [][]int{
+				{5, 10, 15},
+				{22, 44},
+			},
+			expectedInt:  0,
+			expectedBool: false,
+		},
+		{
+			name: "Two inputs",
+			input: [][]int{
+				{5, 10, 15, 20},
+				{4, 8, 12, 20},
+			},
+			expectedInt:  20,
+			expectedBool: true,
+		},
+		{
+			name: "Four inputs",
+			input: [][]int{
+				{5, 10, 15, 20, 25, 30, 35, 40},
+				{10, 20, 30, 40, 50, 60},
+				{20, 40, 60},
+				{8, 16, 24, 32, 40, 48, 56},
+			},
+			expectedInt:  40,
+			expectedBool: true,
+		},
+	}
+
+	var matches chan (int) = make(chan int)
+	var answer chan (int) = make(chan int, 1)
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+
+			go findMatchingEndNodes(matches, test.expectedInt, answer)
+			for val := range test.input {
+				matches <- val
+			}
+			got := <-answer
+			assert.Equal(t, test.expectedInt, got)
 		})
 	}
 }
