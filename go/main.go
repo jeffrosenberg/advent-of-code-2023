@@ -5,6 +5,7 @@ import (
 	"os"
 
 	day1 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day1"
+	day10 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day10"
 	day2 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day2"
 	day3 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day3"
 	day4 "github.com/jeffrosenberg/advent-of-code-2023/go/aoc/day4"
@@ -16,7 +17,7 @@ import (
 	"github.com/jeffrosenberg/advent-of-code-2023/go/pkg/aoc"
 )
 
-const DAY string = "9"
+const DAY string = "10"
 const PART string = "1"
 
 func main() {
@@ -82,7 +83,11 @@ func getSolver(args []string) aoc.Solver {
 		return day9.NewPart1(aoc.ReadAocInput(path))
 	case day == "9" && part == "2":
 		return day9.NewPart2(aoc.ReadAocInput(path))
+	case day == "10" && part == "1":
+		return day10.NewPart1(aoc.ReadAocInput(path))
+	case day == "10" && part == "2":
+		return day10.NewPart2(aoc.ReadAocInput(path))
 	default:
-		return day9.NewPart1(aoc.ReadAocInput(path))
+		return day10.NewPart1(aoc.ReadAocInput(path))
 	}
 }
