@@ -14,6 +14,43 @@ func TestSolvePart1(t *testing.T) {
 	assert.Equal(t, expected, p.Value())
 }
 
+func TestSolvePart2(t *testing.T) {
+	tests := []struct {
+		name            string
+		expansionFactor int
+		expected        int
+		skip            bool
+	}{
+		{
+			name:            "Expand x 10",
+			expansionFactor: 10,
+			expected:        1030,
+		},
+		{
+			name:            "Expand x 100",
+			expansionFactor: 100,
+			expected:        8410,
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			p := NewPart2(aoc.ReadAocInput("../../../inputs/11_test.txt"))
+
+			// Can't just use p.Solve(), because the example answer
+			// uses only factors of 10 and 100
+			points := parseAndExpand(p, test.expansionFactor)
+			p.value = solve(points)
+			assert.Equal(t, test.expected, p.Value())
+		})
+	}
+}
+
 func TestGetPathLength(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -63,7 +100,7 @@ func TestParseAndExpand(t *testing.T) {
 		{x: 0, y: 0},
 		{x: 5, y: 0},
 	}
-	got := parseAndExpand(p)
+	got := parseAndExpand(p, 2)
 	assert.Equal(t, expected, got)
 }
 

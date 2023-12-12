@@ -49,12 +49,8 @@ func (p *Part1) Value() int {
 }
 
 func (p *Part1) Solve() {
-	points := parseAndExpand(p)
-	for i := 0; i < len(points)-1; i++ {
-		for j := i + 1; j < len(points); j++ {
-			p.value += getPathLength(points[i], points[j])
-		}
-	}
+	points := parseAndExpand(p, 2) // Replace one empty row with this many
+	p.value = solve(points)
 }
 
 func NewPart2(lines []string) *Part2 {
@@ -74,14 +70,24 @@ func (p *Part2) Value() int {
 }
 
 func (p *Part2) Solve() {
-	// TODO
+	points := parseAndExpand(p, 1000000) // Replace one empty row with this many
+	p.value = solve(points)
+}
+
+func solve(points []point) (answer int) {
+	for i := 0; i < len(points)-1; i++ {
+		for j := i + 1; j < len(points); j++ {
+			answer += getPathLength(points[i], points[j])
+		}
+	}
+	return answer
 }
 
 // TODO: I bet performance on this stinks, revisit after initial solution
 // 1. Make it work
 // 2. Make it right
 // 3. Make it fast
-func parseAndExpand(solver Solver) (output []point) {
+func parseAndExpand(solver Solver, expansionFactor int) (output []point) {
 	output = []point{}
 	parsed := []*point{}
 	columns := map[int]int{}
@@ -118,7 +124,7 @@ func parseAndExpand(solver Solver) (output []point) {
 		for _, pt := range parsed {
 			// Since these are pointers, we should be able to update them directly
 			if pt.y > y {
-				pt.y += 1
+				pt.y += expansionFactor - 1
 			}
 		}
 	}
@@ -129,7 +135,7 @@ func parseAndExpand(solver Solver) (output []point) {
 		for _, pt := range parsed {
 			// Since these are pointers, we should be able to update them directly
 			if pt.x > x {
-				pt.x += 1
+				pt.x += expansionFactor - 1
 			}
 		}
 	}
