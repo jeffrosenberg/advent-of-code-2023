@@ -76,8 +76,8 @@ type Part1 struct {
 	start pipe
 }
 type Part2 struct {
-	lines []string
 	value int
+	pt1   *Part1
 }
 
 func NewPart1(lines []string) *Part1 {
@@ -123,14 +123,14 @@ func (p *Part1) Parse() {
 
 func NewPart2(lines []string) *Part2 {
 	p := Part2{
-		lines: lines,
 		value: 0,
+		pt1:   NewPart1(lines),
 	}
 	return &p
 }
 
 func (p *Part2) Lines() []string {
-	return p.lines
+	return p.pt1.Lines()
 }
 
 func (p *Part2) Value() int {
@@ -138,12 +138,21 @@ func (p *Part2) Value() int {
 }
 
 func (p *Part2) Solve() {
-	// TODO
+	p.pt1.Parse()
+	loop, _ := calculateLoop(p.pt1, []pipe{p.pt1.getStart()}, "")
+	p.value = calculateInsideLoop(p.pt1, loop)
+}
+
+func calculateInsideLoop(solver Solver, pipes []pipe) int {
+	// TODO: Try this approach:
+	// Iterate through pipes, and at the "bends", try to move in both "inside" directions,
+	// stopping when encountering other pipes that are part of the loop.
+	// Also, use the context of the 2nd and 2nd-to-last pipes to recast the 'S' into the correct bend
+	return 1
 }
 
 func calculateLoop(solver Solver, from []pipe, prev string) (pipes []pipe, success bool) {
 	var prevKey string
-	// allPipes := solver.getPipes()
 	this := from[len(from)-1]
 	if len(from) < 2 {
 		prevKey = ""

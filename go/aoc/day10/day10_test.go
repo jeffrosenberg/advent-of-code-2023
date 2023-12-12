@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSolve(t *testing.T) {
+func TestSolvePart1(t *testing.T) {
 	tests := []struct {
 		name     string
 		file     string
@@ -36,6 +36,115 @@ func TestSolve(t *testing.T) {
 			p := NewPart1(aoc.ReadAocInput(test.file))
 			p.Solve()
 			assert.Equal(t, test.expected, p.Value())
+		})
+	}
+}
+
+func TestSolvePart2(t *testing.T) {
+	tests := []struct {
+		name     string
+		file     string
+		expected int
+		skip     bool
+	}{
+		{
+			name:     "Example 1",
+			file:     "../../../inputs/10_test1.txt",
+			expected: 1,
+		},
+		{
+			name:     "Example 2",
+			file:     "../../../inputs/10_test2.txt",
+			expected: 1,
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			p := NewPart2(aoc.ReadAocInput(test.file))
+			p.Solve()
+			assert.Equal(t, test.expected, p.Value())
+		})
+	}
+}
+
+func TestCalculateInsideLoop(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    []pipe
+		expected int
+		skip     bool
+	}{
+		{
+			name: "Part 1 example 1",
+			input: []pipe{
+				{x: 1, y: 3, orientation: 'S'},
+				{x: 2, y: 3, orientation: '-'},
+				{x: 3, y: 3, orientation: '7'},
+				{x: 3, y: 2, orientation: '|'},
+				{x: 3, y: 1, orientation: 'J'},
+				{x: 2, y: 1, orientation: '-'},
+				{x: 1, y: 1, orientation: 'L'},
+				{x: 1, y: 2, orientation: '|'},
+				{x: 1, y: 3, orientation: 'S'},
+			},
+			expected: 1,
+		},
+		{
+			name: "Part 1 example 2",
+			input: []pipe{
+				{x: 0, y: 2, orientation: 'S'},
+				{x: 1, y: 2, orientation: 'J'},
+				{x: 1, y: 3, orientation: 'F'},
+				{x: 2, y: 3, orientation: 'J'},
+				{x: 2, y: 4, orientation: 'F'},
+				{x: 3, y: 4, orientation: '7'},
+				{x: 3, y: 3, orientation: '|'},
+				{x: 3, y: 2, orientation: 'L'},
+				{x: 4, y: 2, orientation: '7'},
+				{x: 4, y: 1, orientation: 'J'},
+				{x: 3, y: 1, orientation: '-'},
+				{x: 2, y: 1, orientation: '-'},
+				{x: 1, y: 1, orientation: 'F'},
+				{x: 1, y: 0, orientation: 'J'},
+				{x: 0, y: 0, orientation: 'L'},
+				{x: 0, y: 1, orientation: '|'},
+				{x: 0, y: 2, orientation: 'S'},
+			},
+			expected: 1,
+		},
+		{
+			skip:     true,
+			name:     "Part 2 example 1",
+			input:    []pipe{}, // So far I haven't had the energy to fill this in...
+			expected: 4,
+		},
+	}
+
+	for _, test := range tests {
+		if test.skip {
+			t.Skipf("Skipping %s", string(test.name))
+		}
+
+		inputMap := map[string]pipe{}
+		for _, p := range test.input {
+			inputMap[p.string()] = p
+		}
+		p := &Part2{
+			pt1: &Part1{
+				pipes: inputMap,
+			},
+		}
+
+		t.Run(string(test.name), func(t *testing.T) {
+			t.Log(test.name)
+			got := calculateInsideLoop(p.pt1, test.input)
+			assert.Equal(t, test.expected, got)
 		})
 	}
 }
