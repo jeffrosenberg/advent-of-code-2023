@@ -236,7 +236,7 @@ func TestPart2Calculation(t *testing.T) {
 func TestParseLine(t *testing.T) {
 	tests := []struct {
 		name     string
-		input    string // TODO: modify
+		input    string
 		expected []NumberToken
 		skip     bool
 	}{

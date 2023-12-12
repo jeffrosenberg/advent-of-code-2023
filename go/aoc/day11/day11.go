@@ -83,7 +83,8 @@ func solve(points []point) (answer int) {
 	return answer
 }
 
-// TODO: I bet performance on this stinks, revisit after initial solution
+// TODO: This doesn't seem optimal,
+// consider revisiting after initial solution
 // 1. Make it work
 // 2. Make it right
 // 3. Make it fast
@@ -146,7 +147,7 @@ func parseAndExpand(solver Solver, expansionFactor int) (output []point) {
 	return output
 }
 
-func parseLine(line string, y int) (points []*point, columns []int) { // TODO: Set return type
+func parseLine(line string, y int) (points []*point, columns []int) {
 	points = []*point{}
 	columns = []int{}
 
