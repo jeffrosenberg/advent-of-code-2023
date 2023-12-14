@@ -18,12 +18,15 @@ func TestHasReflection(t *testing.T) {
 	tests := []struct {
 		name          string
 		input         []string
+		smudges       int
 		expectedLine  int
 		expectedFound bool
 		skip          bool
 	}{
+		// No "smudges" - part 1
 		{
-			name: "Simple true",
+			name:    "Simple true",
+			smudges: 0,
 			input: []string{
 				".##.",
 				"..#.",
@@ -34,10 +37,11 @@ func TestHasReflection(t *testing.T) {
 			expectedFound: true,
 		},
 		{
-			name: "Simple false",
+			name:    "Simple false",
+			smudges: 0,
 			input: []string{
 				".##.",
-				".##.",
+				"..#.",
 				"....",
 				".##.",
 			},
@@ -45,7 +49,8 @@ func TestHasReflection(t *testing.T) {
 			expectedFound: false,
 		},
 		{
-			name: "Match one line, then no match",
+			name:    "Match one line, then no match",
+			smudges: 0,
 			input: []string{
 				"....",
 				"..#.",
@@ -56,7 +61,8 @@ func TestHasReflection(t *testing.T) {
 			expectedFound: false,
 		},
 		{
-			name: "Example 1 - column, ignore one row",
+			name:    "Example 1 - column, ignore one row",
+			smudges: 0,
 			input: []string{
 				"#.##..#",
 				"..##...",
@@ -72,7 +78,8 @@ func TestHasReflection(t *testing.T) {
 			expectedFound: true,
 		},
 		{
-			name: "Example 2 - row, ignore one row",
+			name:    "Example 2 - row, ignore one row",
+			smudges: 0,
 			input: []string{
 				"#...##..#",
 				"#....#..#",
@@ -85,6 +92,43 @@ func TestHasReflection(t *testing.T) {
 			expectedLine:  4,
 			expectedFound: true,
 		},
+		// 1 "smudge" - part 2
+		{
+			name:    "Simple true with smudge",
+			smudges: 1,
+			input: []string{
+				"###.",
+				"..#.",
+				"..#.",
+				".##.",
+			},
+			expectedLine:  2,
+			expectedFound: true,
+		},
+		{
+			name:    "Simple false with smudge",
+			smudges: 1,
+			input: []string{
+				"###.",
+				"..#.",
+				"..#.",
+				".###",
+			},
+			expectedLine:  0,
+			expectedFound: false,
+		},
+		{
+			name:    "No smudges when one required",
+			smudges: 1,
+			input: []string{
+				"###.",
+				"..#.",
+				"..#.",
+				"###.",
+			},
+			expectedLine:  0,
+			expectedFound: false,
+		},
 	}
 
 	for _, test := range tests {
@@ -94,7 +138,7 @@ func TestHasReflection(t *testing.T) {
 			}
 
 			t.Log(test.name)
-			gotLine, gotFound := hasReflection(test.input)
+			gotLine, gotFound := hasReflection(test.input, test.smudges)
 			assert.Equal(t, test.expectedLine, gotLine)
 			assert.Equal(t, test.expectedFound, gotFound)
 		})

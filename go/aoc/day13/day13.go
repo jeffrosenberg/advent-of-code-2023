@@ -43,8 +43,9 @@ func (p *Part1) Value() int {
 
 func (p *Part1) Solve() {
 	patterns := parse(p)
+	smudges := 0
 	for _, pattern := range patterns {
-		p.value += calculateReflection(pattern)
+		p.value += calculateReflection(pattern, smudges)
 	}
 }
 
@@ -66,44 +67,73 @@ func (p *Part2) Value() int {
 
 func (p *Part2) Solve() {
 	patterns := parse(p)
+	smudges := 1
 	for _, pattern := range patterns {
-		p.value += calculateReflection(pattern)
+		p.value += calculateReflection(pattern, smudges)
 	}
 }
 
-func calculateReflection(pt pattern) int {
-	if line, found := hasReflection(pt.cols); found {
+func calculateReflection(pt pattern, smudges int) int {
+	if line, found := hasReflection(pt.cols, smudges); found {
 		return line
 	}
-	if line, found := hasReflection(pt.rows); found {
+	if line, found := hasReflection(pt.rows, smudges); found {
 		return line * 100
 	}
+
 	return 0
 }
 
-func hasReflection(lines []string) (linePosition int, found bool) {
+func hasReflection(lines []string, smudges int) (linePosition int, found bool) {
 	// TODO: This could be optimized by starting towards the center
 	l := len(lines)
 	for i := 1; i < l; i++ {
-		// Definitely no match at this index; short circuit
-		if lines[i-1] != lines[i] {
-			continue
-		}
-
-		// Possible match, explore further
+		smudgesFound := 0
 		matched := true
 		reflectionSize := aoc.Min(i, len(lines[i:]))
-		for j := 1; j < reflectionSize; j++ {
-			if lines[i-1-j] != lines[i+j] {
-				matched = false
-				break
+
+		for j := 0; j < reflectionSize && smudgesFound <= smudges; j++ {
+			line1 := lines[i-1-j]
+			line2 := lines[i+j]
+			if line1 != line2 {
+				if isSmudge(line1, line2) {
+					smudgesFound += 1
+					// This still counts as a match, but we'll also match smudges
+				} else {
+					matched = false
+					break
+				}
 			}
 		}
-		if matched {
+		if matched && smudgesFound == smudges {
 			return i, true
 		}
 	}
 	return
+}
+
+func isSmudge(a string, b string) bool {
+	if a == b {
+		return false
+	}
+
+	// Test whether there's only a single character out of place
+	missedChars := 0
+	for i := 0; i < len(a); i++ {
+		if a[i] != b[i] {
+			missedChars += 1
+			if missedChars > 1 {
+				return false
+			}
+		}
+	}
+
+	// This should be true if we've reached this point
+	if missedChars == 1 {
+		return true
+	}
+
+	return false // We shouldn't reach this line
 }
 
 func parse(solver Solver) (output []pattern) {
