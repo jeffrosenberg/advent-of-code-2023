@@ -29,11 +29,11 @@ func TestParseLine(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		if test.skip {
-			t.Skipf("Skipping %s", string(test.name))
-		}
-
 		t.Run(string(test.name), func(t *testing.T) {
+			if test.skip {
+				t.Skipf("Skipping %s", string(test.name))
+			}
+
 			t.Log(test.name)
 			got := parseLine(test.input)
 			assert.Equal(t, test.expected, got)
